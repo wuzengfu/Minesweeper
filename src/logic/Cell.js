@@ -1,4 +1,4 @@
-class Cell {
+export default class Cell {
     constructor() {
         /**
          * There are three states for a cell:
@@ -14,5 +14,3 @@ class Cell {
         this.noOfAdjacentMines = 0;
     }
 }
-
-module.exports = Cell;

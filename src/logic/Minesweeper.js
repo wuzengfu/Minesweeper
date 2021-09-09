@@ -1,7 +1,6 @@
-const Cell = require("./Cell");
-const chalk = require("chalk");
+import Cell from './Cell.js';
 
-class Minesweeper {
+export default class Minesweeper {
     constructor(rows, cols) {
         this.rows = rows || 9;
         this.cols = cols || 9;
@@ -43,11 +42,11 @@ class Minesweeper {
             output += "\n";
             for (let j = 0; j < this.grids[0].length; j++) {
                 if (this.grids[i][j].mine) {
-                    output += chalk.red("X");
+                    output += "X";
                 } else if (this.grids[i][j].noOfAdjacentMines === 0) {
-                    output += chalk.bgGray(" ");
+                    output += "-";
                 } else {
-                    output += chalk.bold(this.grids[i][j].noOfAdjacentMines);
+                    output += this.grids[i][j].noOfAdjacentMines;
                 }
                 output += "  ";
             }
@@ -60,7 +59,7 @@ class Minesweeper {
         let output = "";
 
         for (let i = 0; i < this.grids[0].length; i++) {
-            output += chalk.yellow(i) + "  ";
+            output += "  ";
         }
         for (let i = 0; i < this.grids.length; i++) {
             output += "\n";
@@ -68,17 +67,17 @@ class Minesweeper {
                 let cell = this.grids[i][j];
 
                 if (cell.state === "covered") {
-                    output += chalk.green("?");
+                    output += "?";
                 } else if (cell.mine) {
-                    output += chalk.red("X");
+                    output += "X";
                 } else if (cell.noOfAdjacentMines === 0) {
-                    output += chalk.bold("-");
+                    output += "-";
                 } else {
-                    output += chalk.bold(cell.noOfAdjacentMines);
+                    output += cell.noOfAdjacentMines;
                 }
                 output += "  ";
             }
-            output += chalk.yellow(i);
+            output += ""+i;
         }
 
         console.log(output);
@@ -179,5 +178,3 @@ class Minesweeper {
     }
 
 }
-
-module.exports = Minesweeper;
