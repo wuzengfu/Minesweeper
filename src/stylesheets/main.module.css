@@ -1,0 +1,14 @@
+.innerContainer{
+    margin: 0 auto;
+}
+
+.container{
+    display: flex;
+    align-items: center;
+    height: 100vh;
+}
+
+.table{
+    border: 1px solid black;
+    border-collapse: collapse;
+}
