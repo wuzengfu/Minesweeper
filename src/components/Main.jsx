@@ -3,12 +3,17 @@ import Cell from './Cell';
 import Minesweeper from '../logic/Minesweeper';
 import styles from "../stylesheets/main.module.css";
 import { Button } from "react-bootstrap";
+import Timer from "./Timer";
 
 
 class Main extends Component {
     state = {
+        size: [10,10],
+        firstClick: true,
         minesweeper: "",
         grids: [],
+        timer: 0,
+        timerInterval: '',
     }
 
     componentDidMount() {
@@ -16,32 +21,46 @@ class Main extends Component {
     }
 
     initGame = () => {
-        const minesweeper = new Minesweeper();
+        const [row, col] = this.state.size;
+        const minesweeper = new Minesweeper(row, col);
         this.setState({minesweeper, grids: minesweeper.grids});
     }
 
     restart = e => {
         e.preventDefault();
         this.initGame();
+        if (this.state.timerInterval) {
+            clearInterval(this.state.timerInterval);
+            this.setState({timer: 0});
+        }
+    }
+
+    startTimer = () => {
+        const timerInterval = setInterval(() => {
+            if (this.state.timer === 60 * 10 - 1) {
+                clearInterval(timerInterval);
+                this.gameOver("You lose, the time is out!");
+            } else {
+                this.setState({timer: this.state.timer + 1});
+            }
+        }, 1000);
+
+        this.setState({timerInterval});
     }
 
     uncoverCell = (row, col, e) => {
         e.preventDefault();
-        const {minesweeper} = this.state;
+        const {minesweeper, firstClick} = this.state;
+        if (firstClick) {
+            this.setState({firstClick: false});
+            this.startTimer();
+        }
 
         minesweeper.uncoverCell(row, col);
         this.setState({grids: minesweeper.grids});
 
-        if (minesweeper.isLost) {
-            alert("You lose, the game is over!");
-            let grids = minesweeper.getAnswersGrids();
-            this.setState({grids});
-        } else if (minesweeper.isWon) {
-            alert("Congratulations! You win the game!");
-            let grids = minesweeper.getAnswersGrids();
-            this.setState({grids});
-        }
-
+        if (minesweeper.isLost) this.gameOver("You lose, the game is over!");
+        else if (minesweeper.isWon) this.gameOver("Congratulations! You win the game!");
     }
 
     flagCell = (cell, e) => {
@@ -56,11 +75,18 @@ class Main extends Component {
         this.setState({grids: this.state.minesweeper.grids});
     }
 
+    gameOver(msg) {
+        alert(msg);
+        let grids = this.state.minesweeper.getAnswersGrids();
+        this.setState({grids});
+    }
+
     render() {
         return (
             <div className={styles.container}>
                 <div className={styles.innerContainer}>
-                    <div className={"d-flex justify-content-end mb-2"}>
+                    <div className={"d-flex justify-content-between mb-2"}>
+                        <Timer timer={this.state.timer}/>
                         <Button variant={"success"} size={"sm"} onClick={e => this.restart(e)}>Restart</Button>
                     </div>
 
