@@ -5,15 +5,16 @@ import styles from "../stylesheets/main.module.css";
 import { Button } from "react-bootstrap";
 import Timer from "./Timer";
 
+let timerInterval;
 
 class Main extends Component {
     state = {
-        size: [10,10],
+        size: [10, 10],
         firstClick: true,
         minesweeper: "",
         grids: [],
         timer: 0,
-        timerInterval: '',
+        isGameOver: false,
     }
 
     componentDidMount() {
@@ -23,29 +24,30 @@ class Main extends Component {
     initGame = () => {
         const [row, col] = this.state.size;
         const minesweeper = new Minesweeper(row, col);
-        this.setState({minesweeper, grids: minesweeper.grids});
+        this.setState({minesweeper, grids: minesweeper.grids, isGameOver: false, firstClick: true});
     }
 
     restart = e => {
         e.preventDefault();
         this.initGame();
-        if (this.state.timerInterval) {
-            clearInterval(this.state.timerInterval);
+
+        if (timerInterval) {
+            clearInterval(timerInterval);
             this.setState({timer: 0});
         }
     }
 
     startTimer = () => {
-        const timerInterval = setInterval(() => {
+        timerInterval = setInterval(() => {
             if (this.state.timer === 60 * 10 - 1) {
                 clearInterval(timerInterval);
                 this.gameOver("You lose, the time is out!");
+            } else if (this.state.isGameOver) {
+                clearInterval(timerInterval);
             } else {
                 this.setState({timer: this.state.timer + 1});
             }
         }, 1000);
-
-        this.setState({timerInterval});
     }
 
     uncoverCell = (row, col, e) => {
@@ -78,6 +80,7 @@ class Main extends Component {
     gameOver(msg) {
         alert(msg);
         let grids = this.state.minesweeper.getAnswersGrids();
+        this.setState({isGameOver: true});
         this.setState({grids});
     }
 
